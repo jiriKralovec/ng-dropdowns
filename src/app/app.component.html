@@ -1,0 +1,24 @@
+<ng-template #entry let-n="num">
+  <drp-menu #dropdown>Menu {{ n }}</drp-menu>
+  <span class="btn" [attachDropdown]="dropdown">Btn {{ n }}</span>
+</ng-template>
+
+<div class="box">
+  <ng-container *ngTemplateOutlet="entry; context: { num: 1 }"></ng-container>
+</div>
+
+<div class="box" style="justify-content: flex-end">
+  <ng-container *ngTemplateOutlet="entry; context: { num: 2 }"></ng-container>
+</div>
+
+<div class="box" style="width: 100%; align-items: center; justify-content: center;">
+  <ng-container *ngTemplateOutlet="entry; context: { num: 3 }"></ng-container>
+</div>
+
+<div class="box" style="align-items: flex-end">
+  <ng-container *ngTemplateOutlet="entry; context: { num: 4 }"></ng-container>
+</div>
+
+<div class="box" style="align-items: flex-end;justify-content: flex-end">
+  <ng-container *ngTemplateOutlet="entry; context: { num: 4 }"></ng-container>
+</div>
