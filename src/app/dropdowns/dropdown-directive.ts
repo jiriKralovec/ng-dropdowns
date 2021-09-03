@@ -126,18 +126,9 @@ export class DropdownDirective implements OnInit {
       this.dropdownNativeEl.style.top = '100%';
       this.dropdownNativeEl.style.bottom = 'auto';
     }
-    /** X */
-    if (x === 0) {
-      this.dropdownNativeEl.style.right = 'auto';
-      this.dropdownNativeEl.style.left = `-calc(${this.dropdownCurrentWidth /
-        2}px - 0px)`;
-    } else if (x === 1) {
-    } else {
-    }
   }
   private attachWindowListeners() {
     const cb = () => {
-      console.log('Reevaluate');
       this.evaluateDropdownPosition();
     };
     /** First run and attach callback */
