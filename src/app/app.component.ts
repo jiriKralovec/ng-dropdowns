@@ -10,7 +10,7 @@ import {
 
 export type AlignmentX = 'left' | 'right';
 export type AlignmentY = 'top' | 'bottom';
-export type AlignmentOrigin = `${AlignmentY}-${AlignmentX}`;
+export type Alignment = `${AlignmentY}-${AlignmentX}`;
 export type ReactOn = 'click' | 'hover';
 export type DropdownSize = 'small' | 'regular' | 'large';
 
@@ -41,18 +41,8 @@ export class DropdownComponent {
 })
 export class DropdownDirective implements OnInit {
   
-  /**
-   * Defines which horizontal side of relativeTo component should dropdown be aligned to
-   */
-  @Input('align-x') readonly alignX: AlignmentX;
-  /**
-   * Defines which vertical side of relativeTo component should dropdown be aligned to
-   */
-  @Input('align-y') readonly alignY: AlignmentX;
-  /**
-   * Defines origin of alignment
-   */
-  @Input('origin') readonly origin: AlignmentOrigin;
+  @Input('align-to') readonly alignTo: Alignment = 'bottom-left';
+  @Input('origin') readonly origin: Alignment = 'top-left';
   /**
    * Element the dropdown is relative to
    */
@@ -70,14 +60,34 @@ export class DropdownDirective implements OnInit {
     return this._trigger ?? this.relativeTo;
   }
 
-  constructor(private readonly host: ElementRef<DropdownComponent>) {
+  constructor(private readonly host: ElementRef<HTMLElement>) {
 
   }
 
   ngOnInit() {
-    console.log(this.trigger);
-    console.log(this.host);
+    this.setupDropdown();
+    this.setupTrigger();
+    window.addEventListener('resize', () => { this.onWindowResize(); })
+    this.trigger.addEventListener(this.reactOn, () => {
+      console.log('Hey');
+    });
   }
+
+  private setupDropdown() {
+    this.host.nativeElement.style.position = 'absolute';
+    this.host.nativeElement.style.left = '0';
+    this.host.nativeElement.style.top = '0';
+  }
+
+  private setupTrigger() {
+    if(this.reactOn === 'click')
+      this.trigger.style.cursor = 'pointer';
+  }
+
+  private onWindowResize() {
+    
+  }
+
 }
 
 @Component({
