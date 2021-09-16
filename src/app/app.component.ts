@@ -5,7 +5,7 @@ import {
   HostBinding,
   Input,
   OnInit,
-  VERSION
+  VERSION,
 } from '@angular/core';
 
 export type AlignmentX = 'left' | 'right';
@@ -13,6 +13,7 @@ export type AlignmentY = 'top' | 'bottom';
 export type Alignment = `${AlignmentY}-${AlignmentX}`;
 export type ReactOn = 'click' | 'hover';
 export type DropdownSize = 'small' | 'regular' | 'large';
+export type Vector2 = { x: number; y: number };
 
 @Component({
   selector: 'ng-dropdown',
@@ -25,22 +26,45 @@ export type DropdownSize = 'small' | 'regular' | 'large';
         display: block;
         background: red;
       }
-    `
-  ]
+      :host(.hidden) {
+        display: none !important;
+      }
+    `,
+  ],
 })
 export class DropdownComponent {
   @Input('size') readonly size: DropdownSize = 'regular';
-  @HostBinding('class.sm') get isSmall() { return this.size === 'small'; }
-  @HostBinding('class.base') get isRegular() { return this.size === 'regular'; }
-  @HostBinding('class.lg') get isLarge() { return this.size === 'large'; }
+  @HostBinding('class.sm') get isSmall() {
+    return this.size === 'small';
+  }
+  @HostBinding('class.base') get isRegular() {
+    return this.size === 'regular';
+  }
+  @HostBinding('class.lg') get isLarge() {
+    return this.size === 'large';
+  }
+
+  @HostBinding('class.hidden') get isHidden() {
+    return this._isHidden;
+  }
+  private _isHidden: boolean = true;
+
   constructor() {}
+  show() {
+    this._isHidden = false;
+  }
+  hide() {
+    this._isHidden = true;
+  }
+  toggle() {
+    this._isHidden = !this._isHidden;
+  }
 }
 
 @Directive({
-  selector: '[floatingDropdown]'
+  selector: '[floatingDropdown]',
 })
 export class DropdownDirective implements OnInit {
-  
   @Input('align-to') readonly alignTo: Alignment = 'bottom-left';
   @Input('origin') readonly origin: Alignment = 'top-left';
   /**
@@ -60,17 +84,45 @@ export class DropdownDirective implements OnInit {
     return this._trigger ?? this.relativeTo;
   }
 
-  constructor(private readonly host: ElementRef<HTMLElement>) {
-
+  private get triggerDimensions(): Vector2 {
+    return {
+      x: this.trigger.offsetWidth,
+      y: this.trigger.offsetHeight,
+    };
   }
+  private get triggerOffset(): Vector2 {
+    return {
+      x: this.trigger.getBoundingClientRect().left,
+      y: this.trigger.getBoundingClientRect().top,
+    };
+  }
+
+  constructor(
+    private readonly host: ElementRef<HTMLElement>,
+    private readonly hostComponent: DropdownComponent
+  ) {}
 
   ngOnInit() {
     this.setupDropdown();
     this.setupTrigger();
-    window.addEventListener('resize', () => { this.onWindowResize(); })
-    this.trigger.addEventListener(this.reactOn, () => {
-      console.log('Hey');
+    this.setupWindowListener();
+    this.setupTriggerListener();
+    this.setDropdownPosition();
+  }
+
+  private setupWindowListener() {
+    window.addEventListener('resize', () => {
+      this.setDropdownPosition();
     });
+  }
+
+  private setupTriggerListener() {
+    if (this.reactOn === 'click') {
+      this.trigger.addEventListener(this.reactOn, () => {
+        this.hostComponent.toggle();
+      });
+    } else {
+    }
   }
 
   private setupDropdown() {
@@ -80,20 +132,20 @@ export class DropdownDirective implements OnInit {
   }
 
   private setupTrigger() {
-    if(this.reactOn === 'click')
-      this.trigger.style.cursor = 'pointer';
+    if (this.reactOn === 'click') this.trigger.style.cursor = 'pointer';
   }
 
-  private onWindowResize() {
-    
+  private setDropdownPosition() {
+    let x = this.triggerOffset.x;
+    let y = this.triggerOffset.y + this.triggerDimensions.y;
+    this.host.nativeElement.style.transform = `translate3d(${x}px, ${y}px, 0)`;
   }
-
 }
 
 @Component({
   selector: 'my-app',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   name = 'Angular ' + VERSION.major;
