@@ -1,27 +1,8 @@
-:host {
-  display: block;
-  background-color: red;
-  width: 100vw;
-  height: 100vh;
-}
-p {
-  font-family: Lato;
-}
-.btn {
+.trigger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: green;
+  background-color: orange;
   height: 32px;
   padding: 0 12px;
-}
-.box {
-  display: flex;
-  flex-flow: row nowrap;
-  float: left;
-  width: 50%;
-  height: 33.3332%;
-  background: blue;
-  box-sizing: border-box;
-  padding: 16px;
 }
